@@ -1,0 +1,48 @@
+{
+  "name": "webservice",
+  "version": "1.0.0",
+  "description": "<h1>ASSIGNMENT 1:</h1>",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha --recursive --exit",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nehabattula08/webservice.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/nehabattula08/webservice/issues"
+  },
+  "homepage": "https://github.com/nehabattula08/webservice#readme",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.53.1",
+    "assert": "^2.0.0",
+    "aws-sdk": "^2.1089.0",
+    "axios": "^0.25.0",
+    "bcrypt": "^5.0.1",
+    "cookie-parser": "^1.4.6",
+    "deep-email-validator": "^0.1.21",
+    "dotenv": "^16.0.0",
+    "email-validator": "^2.0.4",
+    "express": "^4.17.3",
+    "fs": "^0.0.1-security",
+    "helmet": "^5.0.2",
+    "mocha": "^9.2.0",
+    "multer": "^1.4.4",
+    "multer-s3": "^2.10.0",
+    "nanoid": "^3.3.2",
+    "node-statsd": "^0.1.1",
+    "pg": "^8.7.3",
+    "pg-hstore": "^2.3.4",
+    "pool": "^0.4.1",
+    "request": "^2.88.2",
+    "sequelize": "^6.16.1",
+    "statsd-client": "^0.4.7",
+    "uuid": "^8.3.2",
+    "winston": "^3.7.2"
+  }
+}

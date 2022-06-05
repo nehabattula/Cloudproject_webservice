@@ -1,0 +1,70 @@
+# This is a basic workflow to help you get started with Actions
+
+name: NodeJS test app and postgresql to build AMI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on very pull request that is on the main branch.
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    name: requiredpackertests
+    runs-on: ubuntu-latest
+    
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    strategy:
+      matrix:
+        node-version: [12.x]
+          
+     # Steps represent a sequence of tasks that will be executed as part of the job.
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+        
+
+      # Runs a set of commands using the runners shell.
+      - name: create zip file
+        run:  | 
+              pwd
+              ls -al
+              zip -r webservice.zip ./
+              echo "after zipping"
+              ls -al
+
+      - name: Packer initialization
+        run:  |
+              packer init packerfinal.pkr.hcl
+              packer validate -var-file="devvars.pkrvars.hcl" packerfinal.pkr.hcl
+              packer build -var-file="devvars.pkrvars.hcl" packerfinal.pkr.hcl
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          PACKER_LOG: 1
+      - name: Configuring AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.GHUSER_ACCESSKEY }}
+          aws-secret-access-key: ${{ secrets.GHUSER_SECRETKEY }}
+          aws-region: us-east-1
+      - name: Copying artifact to S3
+        run: |
+          rm -rf aws
+          aws deploy push --application-name csye6225webapp --description "Copying the latest revision for csye6225webapplication-${{ github.sha }}" --ignore-hidden-files --s3-location s3://mycodedeploybucket96/csye6225-webapplication-${{ github.sha}}.zip  --source .
+      - name: Using code deploy
+        run: |
+          aws deploy create-deployment --application-name csye6225webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name csye6225webappdeployment --file-exists-behavior OVERWRITE --s3-location bucket=mycodedeploybucket96,key=csye6225-webapplication-${{ github.sha }}.zip,bundleType=zip
